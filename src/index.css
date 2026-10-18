@@ -1,0 +1,48 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-mono: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;
+  
+  --system-bg-desk: #121214;
+  --system-bg-base: #000000;
+  --system-bg-secondary: #1c1c1e;
+  --system-bg-tertiary: #2c2c2e;
+  
+  --label-primary: #ffffff;
+  --label-secondary: #8e8e93;
+  --label-tertiary: #636366;
+  --label-quaternary: #48484a;
+  
+  --separator: rgba(255, 255, 255, 0.12);
+  --separator-opaque: #38383a;
+  
+  --system-blue: #0a84ff;
+  --system-green: #30d158;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--system-bg-desk);
+  color: var(--label-primary);
+  font-family: var(--font-system);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}

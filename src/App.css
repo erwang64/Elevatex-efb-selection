@@ -1,0 +1,160 @@
+.ipad-wrapper {
+  position: relative;
+  width: min(92vw, 560px);
+  aspect-ratio: 940 / 1320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65));
+}
+
+.ipad-screen-area {
+  position: absolute;
+  left: 6.06%;
+  top: 4.32%;
+  width: 88.19%;
+  height: 91.14%;
+  background-color: var(--system-bg-base);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ipad-overlay-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+  background-image: url('/ipad.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.ipados-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1.25rem 0.4rem;
+  background-color: var(--system-bg-base);
+  user-select: none;
+}
+
+.status-time {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--label-primary);
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--label-primary);
+}
+
+.battery-pill {
+  width: 22px;
+  height: 11px;
+  border: 1.5px solid var(--label-primary);
+  border-radius: 3.5px;
+  padding: 1.5px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.battery-pill::after {
+  content: '';
+  position: absolute;
+  right: -3.5px;
+  top: 2.5px;
+  width: 1.5px;
+  height: 4px;
+  background-color: var(--label-primary);
+  border-top-right-radius: 1px;
+  border-bottom-right-radius: 1px;
+}
+
+.battery-level {
+  width: 80%;
+  height: 100%;
+  background-color: var(--label-primary);
+  border-radius: 1.5px;
+}
+
+.efb-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.nav-large-header {
+  margin-bottom: 2rem;
+}
+
+.nav-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--label-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.nav-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--label-primary);
+}
+
+.nav-subtitle {
+  font-size: 0.92rem;
+  color: var(--label-secondary);
+  margin-top: 0.25rem;
+}
+
+.empty-state-card {
+  background-color: var(--system-bg-secondary);
+  border-radius: 14px;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.empty-state-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--label-primary);
+}
+
+.empty-state-description {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--label-secondary);
+  max-width: 280px;
+}
+
+.efb-footer {
+  margin-top: auto;
+  padding: 1rem 0 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.efb-version {
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--label-tertiary);
+}
