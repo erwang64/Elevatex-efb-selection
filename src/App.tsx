@@ -3,6 +3,7 @@ import { Wifi, ArrowRight, AlertCircle, RefreshCw, Loader2 } from 'lucide-react'
 import { SettingsView } from './components/SettingsView'
 import { FlightPlanView } from './components/FlightPlanView'
 import { fetchFlightPlan, type SimbriefOfp } from './services/simbrief'
+import { useDragScroll } from './hooks/useDragScroll'
 import './App.css'
 
 const STORAGE_KEY = 'elevatex_simbrief_id'
@@ -16,6 +17,7 @@ function App() {
   const [ofp, setOfp] = useState<SimbriefOfp | null>(null)
   const [isLoadingOfp, setIsLoadingOfp] = useState<boolean>(false)
   const [ofpError, setOfpError] = useState<string | null>(null)
+  const scrollRef = useDragScroll<HTMLElement>()
 
   useEffect(() => {
     const formatTime = () => {
@@ -78,7 +80,7 @@ function App() {
           </div>
         </header>
 
-        <section className="efb-body">
+        <section className="efb-body" ref={scrollRef}>
           <div className="nav-large-header">
             <div className="nav-header-row">
               <div className="nav-title-group">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, X, Check, AlertCircle, Loader2 } from 'lucide-react'
 import { verifySimbriefUser, type VerificationResult } from '../services/simbrief'
+import { useDragScroll } from '../hooks/useDragScroll'
 
 interface SettingsViewProps {
   isOpen: boolean
@@ -18,6 +19,7 @@ export function SettingsView({
   const [inputValue, setInputValue] = useState(simbriefId)
   const [isVerifying, setIsVerifying] = useState(false)
   const [verification, setVerification] = useState<VerificationResult | null>(null)
+  const scrollRef = useDragScroll<HTMLDivElement>()
 
   useEffect(() => {
     setInputValue(simbriefId)
@@ -92,7 +94,7 @@ export function SettingsView({
           </button>
         </header>
 
-        <div className="settings-scroll-content">
+        <div className="settings-scroll-content" ref={scrollRef}>
           <div className="inset-grouped-section">
             <span className="section-header-label">SimBrief Account</span>
             <div className={`inset-grouped-card ${verification && !verification.isValid ? 'card-has-error' : ''}`}>
