@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Wifi, ArrowRight } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { Wifi, ArrowRight, AlertCircle, RefreshCw, Loader2 } from 'lucide-react'
 import { SettingsView } from './components/SettingsView'
+import { FlightPlanView } from './components/FlightPlanView'
+import { fetchFlightPlan, type SimbriefOfp } from './services/simbrief'
 import './App.css'
 
 const STORAGE_KEY = 'elevatex_simbrief_id'
@@ -11,6 +13,9 @@ function App() {
   const [simbriefId, setSimbriefId] = useState<string>(() => {
     return localStorage.getItem(STORAGE_KEY) || ''
   })
+  const [ofp, setOfp] = useState<SimbriefOfp | null>(null)
+  const [isLoadingOfp, setIsLoadingOfp] = useState<boolean>(false)
+  const [ofpError, setOfpError] = useState<string | null>(null)
 
   useEffect(() => {
     const formatTime = () => {
@@ -25,12 +30,38 @@ function App() {
     return () => clearInterval(timer)
   }, [])
 
+  const handleLoadFlightPlan = useCallback(async (targetId?: string) => {
+    const idToFetch = targetId !== undefined ? targetId : simbriefId
+    if (!idToFetch.trim()) {
+      setOfp(null)
+      setOfpError(null)
+      return
+    }
+
+    setIsLoadingOfp(true)
+    setOfpError(null)
+
+    const result = await fetchFlightPlan(idToFetch)
+    setIsLoadingOfp(false)
+
+    if (result.success && result.data) {
+      setOfp(result.data)
+      setOfpError(null)
+    } else {
+      setOfp(null)
+      setOfpError(result.error || 'Failed to retrieve flight plan')
+    }
+  }, [simbriefId])
+
   const handleSaveSimbriefId = (id: string) => {
     setSimbriefId(id)
     if (id) {
       localStorage.setItem(STORAGE_KEY, id)
+      handleLoadFlightPlan(id)
     } else {
       localStorage.removeItem(STORAGE_KEY)
+      setOfp(null)
+      setOfpError(null)
     }
   }
 
@@ -73,54 +104,104 @@ function App() {
           </div>
 
           <div className="dispatch-main-content">
-            <div className="inset-grouped-section">
-              <span className="section-header-label">Flight Plan Dispatch</span>
+            {isLoadingOfp && (
+              <div className="efb-loading-panel">
+                <Loader2 size={32} className="spin-icon" />
+                <span className="loading-title">Retrieving Flight Plan</span>
+                <span className="loading-subtitle">Contacting SimBrief API...</span>
+              </div>
+            )}
 
-              {simbriefId ? (
-                <div className="inset-grouped-card">
-                  <div className="settings-row">
-                    <span className="settings-row-label">SimBrief Pilot</span>
-                    <span className="settings-row-value font-mono">{simbriefId}</span>
+            {!isLoadingOfp && ofpError && (
+              <div className="inset-grouped-section">
+                <span className="section-header-label">Flight Plan Error</span>
+                <div className="inset-grouped-card ofp-error-card">
+                  <div className="error-header">
+                    <AlertCircle size={22} className="error-icon" />
+                    <span className="error-title">Unable to Load OFP</span>
                   </div>
-                  <div className="settings-row">
-                    <span className="settings-row-label">Active OFP</span>
-                    <span className="settings-row-value">Ready to Import</span>
-                  </div>
-                  <div className="settings-action-row">
+                  <p className="error-description">{ofpError}</p>
+
+                  <div className="error-actions">
                     <button
                       type="button"
                       className="dispatch-primary-button"
+                      onClick={() => handleLoadFlightPlan()}
                     >
-                      <span>Fetch Flight Plan</span>
-                      <ArrowRight size={15} />
+                      <RefreshCw size={14} />
+                      <span>Retry</span>
                     </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="inset-grouped-card">
-                  <div className="settings-row">
-                    <span className="settings-row-label">SimBrief Account</span>
-                    <span className="settings-row-value text-muted">Not Configured</span>
-                  </div>
-                  <div className="settings-action-row">
                     <button
                       type="button"
                       className="dispatch-secondary-button"
                       onClick={() => setIsSettingsOpen(true)}
                     >
-                      <span>Configure Account</span>
-                      <ArrowRight size={14} />
+                      <span>Check Settings</span>
                     </button>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              <p className="section-footer-note">
-                {simbriefId
-                  ? 'SimBrief account linked. Tap Fetch Flight Plan to retrieve route, aircraft, fuel, and weather.'
-                  : 'Link your SimBrief account in Settings to retrieve your operational flight plans.'}
-              </p>
-            </div>
+            {!isLoadingOfp && !ofpError && ofp && (
+              <FlightPlanView
+                ofp={ofp}
+                onRefresh={() => handleLoadFlightPlan()}
+                isRefreshing={isLoadingOfp}
+              />
+            )}
+
+            {!isLoadingOfp && !ofpError && !ofp && (
+              <div className="inset-grouped-section">
+                <span className="section-header-label">Flight Plan Dispatch</span>
+
+                {simbriefId ? (
+                  <div className="inset-grouped-card">
+                    <div className="settings-row">
+                      <span className="settings-row-label">SimBrief Pilot</span>
+                      <span className="settings-row-value font-mono">{simbriefId}</span>
+                    </div>
+                    <div className="settings-row">
+                      <span className="settings-row-label">Operational Flight Plan</span>
+                      <span className="settings-row-value">Ready to Import</span>
+                    </div>
+                    <div className="settings-action-row">
+                      <button
+                        type="button"
+                        className="dispatch-primary-button"
+                        onClick={() => handleLoadFlightPlan()}
+                      >
+                        <span>Fetch Flight Plan</span>
+                        <ArrowRight size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="inset-grouped-card">
+                    <div className="settings-row">
+                      <span className="settings-row-label">SimBrief Account</span>
+                      <span className="settings-row-value text-muted">Not Configured</span>
+                    </div>
+                    <div className="settings-action-row">
+                      <button
+                        type="button"
+                        className="dispatch-secondary-button"
+                        onClick={() => setIsSettingsOpen(true)}
+                      >
+                        <span>Configure Account</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <p className="section-footer-note">
+                  {simbriefId
+                    ? 'SimBrief account linked. Tap Fetch Flight Plan to retrieve route, aircraft, fuel, and weather.'
+                    : 'Link your SimBrief account in Settings to retrieve your operational flight plans.'}
+                </p>
+              </div>
+            )}
           </div>
 
           <footer className="efb-footer">
